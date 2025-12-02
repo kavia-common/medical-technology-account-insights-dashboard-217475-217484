@@ -1,7 +1,8 @@
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Dashboard from './pages/Dashboard.jsx';
 
-// Lightweight placeholder pages
+// Lightweight placeholder pages (keep others simple for now)
 function PageContainer({ title, children }) {
   return (
     <div className="container" style={{ paddingTop: '24px', paddingBottom: '24px' }}>
@@ -12,11 +13,6 @@ function PageContainer({ title, children }) {
     </div>
   );
 }
-
-// PUBLIC_INTERFACE
-export const Dashboard = () => (
-  <PageContainer title="Dashboard">Overview KPIs and quick insights.</PageContainer>
-);
 
 // PUBLIC_INTERFACE
 export const Accounts = () => (

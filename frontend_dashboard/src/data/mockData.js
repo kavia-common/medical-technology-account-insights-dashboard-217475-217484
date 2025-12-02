@@ -267,7 +267,7 @@ export function getAccounts() {
  * Returns: Promise<{
  *   revenue: Array<{ month: "YYYY-MM", value: number }>,
  *   deals: Array<{ month: "YYYY-MM", value: number }>,
- *   churnRatePct: Array<{ month: "YYYY-MM", value: number /* fraction 0..1 */ }>,
+ *   churnRatePct: Array<{ month: "YYYY-MM", value: number }>,
  *   productLines: Array<{ key: string, series: Array<{ month, value }> }>
  * }>
  */
