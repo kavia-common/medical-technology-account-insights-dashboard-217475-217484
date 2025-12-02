@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard.jsx';
 
 // Lightweight placeholder pages (keep others simple for now)
@@ -36,21 +36,19 @@ export const Reports = () => (
 
 /**
  * PUBLIC_INTERFACE
- * AppRouter sets up the hash-based router and all primary routes.
+ * AppRouter defines all primary routes. The application root must provide a Router.
  */
 export function AppRouter() {
   return (
-    <HashRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/accounts" element={<Accounts />} />
-        <Route path="/accounts/:accountId" element={<AccountDetail />} />
-        <Route path="/insights" element={<Insights />} />
-        <Route path="/reports" element={<Reports />} />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </HashRouter>
+    <Routes>
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/accounts" element={<Accounts />} />
+      <Route path="/accounts/:accountId" element={<AccountDetail />} />
+      <Route path="/insights" element={<Insights />} />
+      <Route path="/reports" element={<Reports />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   );
 }
 
