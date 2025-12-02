@@ -1,0 +1,4 @@
+{
+    "command": "npm run test",
+    "working_directory": "/home/kavia/workspace/code-generation/medical-technology-account-insights-dashboard-217475-217484/frontend_dashboard"
+}
