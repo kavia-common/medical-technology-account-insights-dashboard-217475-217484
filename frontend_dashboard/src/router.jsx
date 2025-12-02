@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard.jsx';
 import Accounts from './pages/Accounts.jsx';
+import Insights from './pages/Insights.jsx';
 
 // Lightweight placeholder pages (keep others simple for now)
 function PageContainer({ title, children }) {
@@ -18,11 +19,6 @@ function PageContainer({ title, children }) {
 // PUBLIC_INTERFACE
 export const AccountDetail = () => (
   <PageContainer title="Account Detail">Deep dive into a specific account.</PageContainer>
-);
-
-// PUBLIC_INTERFACE
-export const Insights = () => (
-  <PageContainer title="Insights">Generated insights and opportunities.</PageContainer>
 );
 
 // PUBLIC_INTERFACE
