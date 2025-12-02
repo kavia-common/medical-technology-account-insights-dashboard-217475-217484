@@ -26,7 +26,9 @@ const mockData = {
     activeAccounts: 342,
     churnPct: 0.018
   },
+  // Maintain separate store to enable runtime mutations without altering original literal
   accounts: [
+    // Note: this simplified shape differs from pages/mockData usage; createAccount will output full shape
     { id: "A-1001", name: "City General Hospital", region: "Northeast", spend: 1534000, growthPct: 0.042 },
     { id: "A-1002", name: "Valley Medical Center", region: "West", spend: 986000, growthPct: -0.012 },
     { id: "A-1003", name: "Riverside Health", region: "Midwest", spend: 712300, growthPct: 0.078 }
@@ -36,6 +38,8 @@ const mockData = {
     { id: "I-2", title: "Bundle proposal for imaging and monitoring", impact: "medium" }
   ]
 };
+// In-memory account store for mock mode to persist runtime creates
+let mockAccountStore = [];
 
 /**
  * PUBLIC_INTERFACE
@@ -64,13 +68,24 @@ export function getKpis({ signal } = {}) {
 export function getAccounts({ signal } = {}) {
   const useMock = readMockFlag();
   if (useMock) {
-    return Promise.resolve(structuredCloneIfPossible(mockData.accounts));
+    // Combine seed mock entries and any created ones (full shape)
+    const seed = structuredCloneIfPossible(mockData.accounts);
+    const created = structuredCloneIfPossible(mockAccountStore);
+    // Normalize: ensure we return objects with fields AccountTable expects when possible
+    const normalized = [...created, ...seed].map((a) => normalizeAccountShape(a));
+    return Promise.resolve(normalized);
   }
   const base = getApiBase();
   if (!base) {
-    return Promise.resolve(structuredCloneIfPossible(mockData.accounts));
+    const seed = structuredCloneIfPossible(mockData.accounts);
+    const normalized = seed.map((a) => normalizeAccountShape(a));
+    return Promise.resolve(normalized);
   }
-  return fetchJson(`${base}/accounts`, { signal }).catch(() => structuredCloneIfPossible(mockData.accounts));
+  return fetchJson(`${base}/accounts`, { signal }).catch(() => {
+    const seed = structuredCloneIfPossible(mockData.accounts);
+    const normalized = seed.map((a) => normalizeAccountShape(a));
+    return normalized;
+  });
 }
 
 /**
@@ -100,7 +115,8 @@ export function useApi() {
     mock: Boolean(flags?.mock),
     getKpis,
     getAccounts,
-    getInsights
+    getInsights,
+    createAccount
   };
 }
 
@@ -165,9 +181,81 @@ function structuredCloneIfPossible(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
+/**
+ * Normalize incoming account-like objects into the shape used by AccountTable/mockData.
+ * Ensures keys: id, name, region, segment, last12moRevenue, growthPct, owner, city, state, specialties[], bedCount
+ */
+function normalizeAccountShape(a) {
+  if (!a || typeof a !== "object") return a;
+  return {
+    id: a.id,
+    name: a.name,
+    region: a.region,
+    segment: a.segment || a.type || "Acute Care",
+    last12moRevenue: a.last12moRevenue ?? a.revenue ?? a.spend ?? 0,
+    growthPct: typeof a.growthPct === "number" ? a.growthPct : (typeof a.healthScore === "number" ? a.healthScore / 100 : 0),
+    owner: a.owner || "Unassigned",
+    specialties: Array.isArray(a.specialties) ? a.specialties : (a.deviceCategory ? [a.deviceCategory] : []),
+    bedCount: a.bedCount ?? 0,
+    city: a.city || "",
+    state: a.state || "",
+    status: a.status || "Active",
+    createdAt: a.createdAt || undefined,
+    updatedAt: a.updatedAt || undefined
+  };
+}
+
+function generateAccountId() {
+  const ts = Date.now();
+  const rnd = Math.floor(Math.random() * 900 + 100);
+  return `ACC-${ts.toString().slice(-6)}${rnd}`;
+}
+
+// PUBLIC_INTERFACE
+export async function createAccount(account, { signal } = {}) {
+  /**
+   * Create a new account.
+   * In mock mode: updates in-memory store and returns the created object with id, timestamps.
+   * In real mode: POST to /accounts (future), currently falls back to mock behavior if base missing.
+   * Expected input keys (minimal): name, region, segment, last12moRevenue, growthPct, specialties[], owner?, city?, state?, status?
+   */
+  const useMock = readMockFlag();
+  const now = new Date().toISOString();
+  const base = getApiBase();
+
+  const normalizedInput = normalizeAccountShape(account);
+  const newAccount = {
+    ...normalizedInput,
+    id: normalizedInput.id || generateAccountId(),
+    createdAt: now,
+    updatedAt: now
+  };
+
+  if (useMock || !base) {
+    mockAccountStore = [newAccount, ...mockAccountStore];
+    return Promise.resolve(structuredCloneIfPossible(newAccount));
+  }
+
+  // Future real POST
+  try {
+    const res = await fetchJson(`${base}/accounts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(newAccount),
+      signal
+    });
+    return res;
+  } catch {
+    // fallback to mock runtime store on failure
+    mockAccountStore = [newAccount, ...mockAccountStore];
+    return structuredCloneIfPossible(newAccount);
+  }
+}
+
 export default {
   getKpis,
   getAccounts,
   getInsights,
+  createAccount,
   useApi
 };

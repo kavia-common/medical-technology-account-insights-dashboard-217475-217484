@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiltersBar, AccountTable } from "../components";
+import { FiltersBar, AccountTable, AccountForm } from "../components";
 import { formatCurrency, formatPercent } from "../utils/formatters";
 import { getAccounts as getMockAccounts } from "../data/mockData";
+import { createAccount as apiCreateAccount } from "../utils/api";
 
 /**
  * PUBLIC_INTERFACE
@@ -20,6 +21,10 @@ export default function Accounts() {
   // data and loading
   const [loading, setLoading] = useState(true);
   const [accounts, setAccounts] = useState([]);
+  const [showAdd, setShowAdd] = useState(false);
+  const [submitBusy, setSubmitBusy] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState("");
 
   // filters state - extends FiltersBar with additional fields for this page
   const [filters, setFilters] = useState({
@@ -125,13 +130,70 @@ export default function Accounts() {
       minHealthScore: ""
     });
 
+  async function handleCreateAccount(payload) {
+    setSubmitError("");
+    setSubmitSuccess("");
+    setSubmitBusy(true);
+    try {
+      const created = await apiCreateAccount({
+        ...payload
+      });
+      // optimistic add to full accounts list
+      setAccounts((prev) => [created, ...prev]);
+      // reset filters to show the new record easily and go to first page
+      resetFilters();
+      setPage(1);
+      setSubmitSuccess(`Account "${created.name}" created successfully.`);
+      // hide the form after a brief delay to confirm success to SR users
+      setTimeout(() => {
+        setShowAdd(false);
+        setSubmitSuccess("");
+      }, 1000);
+    } catch (e) {
+      setSubmitError("Failed to create account. Please try again.");
+    } finally {
+      setSubmitBusy(false);
+    }
+  }
+
   // Additional filter controls not present in shared FiltersBar are rendered inline below it.
   return (
     <div className="container" style={{ paddingTop: 16, paddingBottom: 24 }}>
-      <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 16 }}>
-        <h1 style={{ margin: 0 }}>Accounts</h1>
-        <span className="text-muted">Filter and explore customer accounts</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
+          <h1 style={{ margin: 0 }}>Accounts</h1>
+          <span className="text-muted">Filter and explore customer accounts</span>
+        </div>
+        <div>
+          <button
+            className="btn-primary"
+            onClick={() => {
+              setShowAdd((v) => !v);
+              setSubmitError("");
+              setSubmitSuccess("");
+            }}
+            aria-expanded={showAdd}
+            aria-controls="add-account-panel"
+          >
+            {showAdd ? "Close" : "Add Account"}
+          </button>
+        </div>
       </div>
+
+      {showAdd && (
+        <section id="add-account-panel" aria-label="Add account" className="card" style={{ marginBottom: 12 }}>
+          <h3 style={{ marginTop: 0 }}>New Account</h3>
+          <AccountForm
+            options={{ regions: options.regions, segments: options.segments, deviceCategories: options.deviceCategories }}
+            onSubmit={handleCreateAccount}
+            onCancel={() => { setShowAdd(false); setSubmitError(""); setSubmitSuccess(""); }}
+            submitLabel="Create Account"
+            busy={submitBusy}
+            error={submitError}
+            success={submitSuccess}
+          />
+        </section>
+      )}
 
       {/* Primary Filters (shared) */}
       <FiltersBar
