@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard.jsx';
+import Accounts from './pages/Accounts.jsx';
 
 // Lightweight placeholder pages (keep others simple for now)
 function PageContainer({ title, children }) {
@@ -13,11 +14,6 @@ function PageContainer({ title, children }) {
     </div>
   );
 }
-
-// PUBLIC_INTERFACE
-export const Accounts = () => (
-  <PageContainer title="Accounts">Browse and search accounts.</PageContainer>
-);
 
 // PUBLIC_INTERFACE
 export const AccountDetail = () => (
