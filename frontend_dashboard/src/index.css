@@ -1,13 +1,266 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* 
+  Global Styles and Theme Tokens - Ocean Professional
+  - Implements CSS variables for light and dark themes
+  - Provides base resets, typography, focus outlines, and utility classes
+  - Designed for accessible contrast and smooth transitions
+*/
+
+/* CSS Variables - Light Theme (default) */
+:root {
+  /* Brand Colors */
+  --color-primary: #2563EB;   /* blue-600 */
+  --color-secondary: #F59E0B; /* amber-500 (also success accent) */
+  --color-success: #10B981;   /* emerald-500 (supporting success) */
+  --color-error: #EF4444;     /* red-500 */
+
+  /* Background and Surfaces */
+  --color-background: #f9fafb; /* gray-50 */
+  --color-surface: #ffffff;    /* white */
+  --color-muted: #f3f4f6;      /* gray-100 */
+  --color-border: #e5e7eb;     /* gray-200 */
+
+  /* Text */
+  --color-text: #111827;       /* gray-900 */
+  --color-text-muted: #4b5563; /* gray-600 */
+  --color-link: var(--color-primary);
+
+  /* Focus Outline */
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.35);
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+
+  /* Spacing Scale (4px base) */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* Shadows (subtle, modern) */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.05);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Gradients */
+  --gradient-soft: linear-gradient(180deg, rgba(59,130,246,0.10), #F9FAFB);
+  --gradient-accent: radial-gradient(1200px 600px at 10% -10%, rgba(37,99,235,0.10), transparent 60%);
+
+  /* Container width */
+  --container-max: 1200px;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* CSS Variables - Dark Theme */
+:root[data-theme="dark"] {
+  --color-background: #0b1220; /* deep navy */
+  --color-surface: #111826;    /* dark slate */
+  --color-muted: #0f172a;      /* slate-900 */
+  --color-border: #1f2937;     /* gray-800 */
+
+  --color-text: #e5e7eb;       /* gray-200 */
+  --color-text-muted: #94a3b8; /* slate-400 */
+  --color-link: #93c5fd;       /* blue-300 */
+  --color-primary: #3B82F6;    /* blue-500 for better dark contrast */
+  --color-secondary: #F59E0B;
+  --color-success: #34D399;    /* emerald-400 */
+  --color-error: #F87171;      /* red-400 */
+
+  --focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.45);
+
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.40);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.35);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.45), 0 2px 4px rgba(0,0,0,0.35);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.45), 0 4px 6px rgba(0,0,0,0.35);
+
+  --gradient-soft: linear-gradient(180deg, rgba(59,130,246,0.12), #0b1220);
+  --gradient-accent: radial-gradient(1200px 600px at 10% -10%, rgba(59,130,246,0.18), transparent 60%);
+}
+
+/* Reset and Base Styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  color: var(--color-text);
+  background: var(--color-background);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Subtle background depth */
+  background-image: var(--gradient-accent);
+  background-attachment: fixed;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 var(--space-3);
+  line-height: 1.25;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+}
+
+p {
+  margin: 0 0 var(--space-4);
+  color: var(--color-text-muted);
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+/* Lists and images */
+ul, ol {
+  margin: 0 0 var(--space-4);
+  padding-left: var(--space-6);
+}
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Form elements */
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+  box-shadow: var(--shadow-xs);
+}
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-xs);
+}
+
+input, select, textarea {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  box-shadow: var(--shadow-xs) inset;
+}
+
+/* Focus states - accessible outline */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Containers and Cards */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5);
+  transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* Utility Classes */
+.text-muted { color: var(--color-text-muted); }
+.surface    { background: var(--color-surface); }
+.bg-muted   { background: var(--color-muted); }
+.border     { border: 1px solid var(--color-border); }
+.rounded    { border-radius: var(--radius-md); }
+.shadow     { box-shadow: var(--shadow-sm); }
+.shadow-lg  { box-shadow: var(--shadow-lg); }
+
+/* Gradient utilities per style guide */
+.gradient-soft {
+  background-image: var(--gradient-soft);
+}
+.gradient-accent {
+  background-image: var(--gradient-accent);
+}
+
+/* Primary and Accent Buttons */
+.btn-primary {
+  background: var(--color-primary);
+  color: #ffffff;
+  border: 1px solid rgba(0,0,0,0);
+}
+.btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+.btn-secondary {
+  background: var(--color-secondary);
+  color: #111827; /* ensure contrast on amber */
+  border: 1px solid rgba(0,0,0,0);
+}
+
+/* Code font utility */
+code, .code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
